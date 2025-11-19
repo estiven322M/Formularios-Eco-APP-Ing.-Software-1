@@ -1,7 +1,5 @@
 package Actividad3;
 
-
-
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
@@ -20,7 +18,14 @@ public class FormularioActividad3 extends JFrame {
     private JTextArea txtObservaciones;
     private JButton btnFinalizar;
 
-    public FormularioActividad3() {
+    // Se añade la variable para el callback ---
+    private Runnable onCompleteCallback;
+
+    
+    public FormularioActividad3(Runnable onCompleteCallback) {
+        // Se guarda el callback
+        this.onCompleteCallback = onCompleteCallback;
+        
         // --- Configuración básica de la ventana ---
         setTitle("Formulario de Firma de Acta de Consolidación - F-U6-01");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -112,7 +117,7 @@ public class FormularioActividad3 extends JFrame {
 
         mainPanel.add(southPanel, BorderLayout.SOUTH);
         
-        // --- Lógica de Eventos ---
+        //  Eventos ---
 
         // Evento para el botón Imprimir
         btnImprimirActa.addActionListener(e -> {
@@ -149,14 +154,19 @@ public class FormularioActividad3 extends JFrame {
 
         JOptionPane.showMessageDialog(this, "Proceso finalizado con éxito.\n\n" + resumen, "Acta Archivada", JOptionPane.INFORMATION_MESSAGE);
         
-        // Opcional: Cerrar la ventana
-        // dispose();
+        
+        if (onCompleteCallback != null) {
+            onCompleteCallback.run(); 
+        }
+        dispose(); 
     }
 
-    // Método main para ejecutar la ventana de forma independiente
+    
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            new FormularioActividad3().setVisible(true);
+            new FormularioActividad3(() -> {
+                System.out.println("Prueba de Main: Actividad 3 completada.");
+            }).setVisible(true);
         });
     }
 }

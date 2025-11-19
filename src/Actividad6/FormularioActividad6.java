@@ -23,7 +23,14 @@ public class FormularioActividad6 extends JFrame {
     private JPanel panelB;
     private JPanel panelC;
 
-    public FormularioActividad6() {
+    // Se añade la variable para el callback ---
+    private Runnable onCompleteCallback;
+
+    
+    public FormularioActividad6(Runnable onCompleteCallback) {
+        // Se guarda el callback
+        this.onCompleteCallback = onCompleteCallback;
+        
         // --- Configuración básica de la ventana ---
         setTitle("Formulario de Orden de Despacho - F-U9-02");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -152,17 +159,30 @@ public class FormularioActividad6 extends JFrame {
         }
 
         JOptionPane.showMessageDialog(this, "Orden de Despacho confirmada. El paquete está listo para salir.", "Proceso Completado", JOptionPane.INFORMATION_MESSAGE);
-        dispose(); // Cierra la ventana
+        
+        // Se llama al callback y se cierra ---
+        if (onCompleteCallback != null) {
+            onCompleteCallback.run(); // Avisa al menú principal
+        }
+        dispose(); // Cierra esta ventana
     }
 
     private void setPanelEnabled(JPanel panel, boolean isEnabled) {
         panel.setEnabled(isEnabled);
         for (Component comp : panel.getComponents()) {
-            comp.setEnabled(isEnabled);
+            
+            if (comp instanceof JPanel) {
+                setPanelEnabled((JPanel) comp, isEnabled);
+            } else {
+                comp.setEnabled(isEnabled);
+            }
         }
     }
 
+    
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new FormularioActividad6().setVisible(true));
+        SwingUtilities.invokeLater(() -> new FormularioActividad6(() -> {
+            System.out.println("Prueba de Main: Actividad 6 completada.");
+        }).setVisible(true));
     }
 }

@@ -1,7 +1,5 @@
 package Actividad4;
 
-
-
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
@@ -20,7 +18,14 @@ public class FormularioActividad4 extends JFrame {
     private JCheckBox chkEntregaCliente;
     private JButton btnFinalizar;
 
-    public FormularioActividad4() {
+    // Se añade la variable para el callback ---
+    private Runnable onCompleteCallback;
+
+    
+    public FormularioActividad4(Runnable onCompleteCallback) {
+        // Se guarda el callback
+        this.onCompleteCallback = onCompleteCallback;
+        
         // --- Configuración básica de la ventana ---
         setTitle("Formulario de Generación de Tarjeta de Bulto - F-U8-01");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -117,10 +122,9 @@ public class FormularioActividad4 extends JFrame {
             lblDatosCliente.setText("Jhon Stivenson Méndez - C.C. 1094xxxxxx");
             lblCantidadPaquetes.setText("3");
             lblDestino.setText("Armenia - Quindío");
-            JPanel panelB = null;
-			setPanelEnabled(panelB, true);
-            JPanel panelC = null;
-			setPanelEnabled(panelC, true);
+            
+            setPanelEnabled((JPanel) lblDatosCliente.getParent(), true); // Habilita panelB
+            setPanelEnabled((JPanel) txtCodigoBulto.getParent(), true); // Habilita panelC
             JOptionPane.showMessageDialog(this, "Consolidación encontrada.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(this, "Código de consolidación no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -137,9 +141,8 @@ public class FormularioActividad4 extends JFrame {
             "Enviando a la etiquetadora... Por favor, retire la tarjeta impresa y entréguela al cliente.", 
             "Imprimiendo Tarjeta", JOptionPane.INFORMATION_MESSAGE);
 
-        JPanel panelD = null;
-		// Habilitar la confirmación
-        setPanelEnabled(panelD, true);
+        // Habilitar la confirmación
+        setPanelEnabled((JPanel) chkEntregaCliente.getParent(), true); // Habilita panelD
         btnGenerarImprimir.setEnabled(false);
     }
     
@@ -150,7 +153,12 @@ public class FormularioActividad4 extends JFrame {
         }
 
         JOptionPane.showMessageDialog(this, "Proceso de etiquetado finalizado con éxito.", "Proceso Completado", JOptionPane.INFORMATION_MESSAGE);
-        dispose(); // Cierra la ventana
+        
+       
+        if (onCompleteCallback != null) {
+            onCompleteCallback.run(); // Avisa al menú principal
+        }
+        dispose(); // Cierra esta ventana
     }
 
     // Método utilitario para habilitar/deshabilitar todos los componentes de un panel
@@ -165,10 +173,12 @@ public class FormularioActividad4 extends JFrame {
         }
     }
 
-    // Método main para ejecutar
+    
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            new FormularioActividad4().setVisible(true);
+            new FormularioActividad4(() -> {
+                System.out.println("Prueba de Main: Actividad 4 completada.");
+            }).setVisible(true);
         });
     }
 }

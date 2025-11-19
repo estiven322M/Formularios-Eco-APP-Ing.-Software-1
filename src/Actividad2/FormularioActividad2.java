@@ -1,7 +1,5 @@
 package Actividad2;
 
-
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -22,8 +20,15 @@ public class FormularioActividad2 extends JFrame {
     private JTextArea txtObservaciones;
     private JButton btnBuscar;
     private JButton btnFinalizar;
+    
+    //  Se añade la variable para el callback ---
+    private Runnable onCompleteCallback;
 
-    public FormularioActividad2() {
+    
+    public FormularioActividad2(Runnable onCompleteCallback) {
+        // Se guarda el callback
+        this.onCompleteCallback = onCompleteCallback;
+        
         // --- Configuración básica de la ventana ---
         setTitle("Formulario de Admisión en Ventanilla - F-U4-01");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -153,7 +158,7 @@ public class FormularioActividad2 extends JFrame {
         }
 
         // Simulación de búsqueda en base de datos
-        // Si el código empieza con "FA" (Ficha Admisión), lo consideramos válido
+        // Si el código empieza con "FA" (Ficha Admisión), se consideramos válido
         if (codigo.toUpperCase().startsWith("FA-")) {
             txtNombreCliente.setText("Jhon Stivenson Méndez");
             txtCedulaCliente.setText("1094xxxxxx");
@@ -193,15 +198,20 @@ public class FormularioActividad2 extends JFrame {
 
         JOptionPane.showMessageDialog(this, "Admisión finalizada con éxito.\n\n" + resumen, "Proceso Completado", JOptionPane.INFORMATION_MESSAGE);
         
-        // Opcional: Cerrar la ventana después de finalizar
-        // dispose();
+        // Se llama al callback y se cierra ---
+        if (onCompleteCallback != null) {
+            onCompleteCallback.run(); // Avisa al menú principal
+        }
+        dispose(); // Cierra esta ventana
     }
 
 
-    // Método main para ejecutar la ventana de forma independiente
+    
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            new FormularioActividad2().setVisible(true);
+            new FormularioActividad2(() -> {
+                System.out.println("Prueba de Main: Actividad 2 completada.");
+            }).setVisible(true);
         });
     }
 }

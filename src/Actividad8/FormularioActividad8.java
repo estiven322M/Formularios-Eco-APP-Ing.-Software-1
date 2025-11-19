@@ -19,7 +19,14 @@ public class FormularioActividad8 extends JFrame {
     private JPanel panelB;
     private JPanel panelC;
 
-    public FormularioActividad8() {
+    // Se añade la variable para el callback ---
+    private Runnable onCompleteCallback;
+
+    //  Se modifica el constructor para aceptar el callback ---
+    public FormularioActividad8(Runnable onCompleteCallback) {
+        // Se guarda el callback
+        this.onCompleteCallback = onCompleteCallback;
+        
         // --- Configuración básica de la ventana ---
         setTitle("Formulario de Notificación de Salida - F-U9-03");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -137,7 +144,12 @@ public class FormularioActividad8 extends JFrame {
             lblEstadoEnvio.setForeground(new Color(0, 128, 0)); // Verde oscuro
             btnEnviar.setEnabled(false);
             JOptionPane.showMessageDialog(this, "La notificación ha sido enviada al cliente.", "Proceso Finalizado", JOptionPane.INFORMATION_MESSAGE);
-            // dispose(); // Cierra la ventana
+            
+            // Se llama al callback y se cierra ---
+            if (onCompleteCallback != null) {
+                onCompleteCallback.run(); // Avisa al menú principal
+            }
+            dispose(); // Cierra esta ventana
         });
         timer.setRepeats(false); // Para que se ejecute solo una vez
         timer.start();
@@ -146,11 +158,19 @@ public class FormularioActividad8 extends JFrame {
     private void setPanelEnabled(JPanel panel, boolean isEnabled) {
         panel.setEnabled(isEnabled);
         for (Component comp : panel.getComponents()) {
-            comp.setEnabled(isEnabled);
+           
+            if (comp instanceof JPanel) {
+                setPanelEnabled((JPanel) comp, isEnabled);
+            } else {
+                comp.setEnabled(isEnabled);
+            }
         }
     }
 
+    
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new FormularioActividad8().setVisible(true));
+        SwingUtilities.invokeLater(() -> new FormularioActividad8(() -> {
+            System.out.println("Prueba de Main: Actividad 8 completada.");
+        }).setVisible(true));
     }
 }

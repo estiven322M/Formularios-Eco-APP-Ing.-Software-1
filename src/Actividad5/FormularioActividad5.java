@@ -23,8 +23,15 @@ public class FormularioActividad5 extends JFrame {
     private JPanel panelB;
     private JPanel panelC;
     private JPanel panelD;
+    
+    // Se añade la variable para el callback ---
+    private Runnable onCompleteCallback;
 
-    public FormularioActividad5() {
+    
+    public FormularioActividad5(Runnable onCompleteCallback) {
+        // Se guarda el callback
+        this.onCompleteCallback = onCompleteCallback;
+        
         // --- Configuración básica de la ventana ---
         setTitle("Formulario de Verificación de Carga - F-U5-01");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -128,7 +135,7 @@ public class FormularioActividad5 extends JFrame {
 
     private void buscarBulto() {
         String codigo = txtCodigoBulto.getText().trim();
-        // Simulación: si el código empieza con "BTO", lo encontramos
+        // Simulación: si el código empieza con "BTO"
         if (codigo.toUpperCase().startsWith("BTO-")) {
             setPanelEnabled(panelB, true);
             setPanelEnabled(panelC, true);
@@ -161,17 +168,31 @@ public class FormularioActividad5 extends JFrame {
         }
 
         JOptionPane.showMessageDialog(this, "Proceso de verificación de carga finalizado con éxito.", "Proceso Completado", JOptionPane.INFORMATION_MESSAGE);
-        dispose(); // Cierra la ventana
+        
+        // --- 3. Se llama al callback (si es exitoso) y se cierra ---
+        // Asumimos que si se finaliza, fue APROBADO 
+        if (rbtnAprobada.isSelected() && onCompleteCallback != null) {
+            onCompleteCallback.run(); // Avisa al menú principal
+        }
+        dispose(); // Cierra esta ventana
     }
 
     private void setPanelEnabled(JPanel panel, boolean isEnabled) {
         panel.setEnabled(isEnabled);
         for (Component comp : panel.getComponents()) {
-            comp.setEnabled(isEnabled);
+            
+            if (comp instanceof JPanel) {
+                setPanelEnabled((JPanel) comp, isEnabled);
+            } else {
+                comp.setEnabled(isEnabled);
+            }
         }
     }
 
+    
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new FormularioActividad5().setVisible(true));
+        SwingUtilities.invokeLater(() -> new FormularioActividad5(() -> {
+            System.out.println("Prueba de Main: Actividad 5 completada.");
+        }).setVisible(true));
     }
 }

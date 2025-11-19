@@ -22,8 +22,15 @@ public class FormularioActividad7 extends JFrame {
     private JPanel panelB;
     private JPanel panelC;
 
-    public FormularioActividad7() {
-        // --- Configuración básica de la ventana ---
+    // Se añade la variable para el callback ---
+    private Runnable onCompleteCallback;
+
+  
+    public FormularioActividad7(Runnable onCompleteCallback) {
+        // Se guarda el callback
+        this.onCompleteCallback = onCompleteCallback;
+        
+        // --- Configuración  de la ventana ---
         setTitle("Formulario de Registro de Salida de Flota - F-U10-01");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(820, 450);
@@ -139,17 +146,30 @@ public class FormularioActividad7 extends JFrame {
         JOptionPane.showMessageDialog(this, 
             "Registro de Salida Confirmado y Archivado.\n\nVehículo: " + lblPlaca.getText() + "\nHora de Salida: " + timestamp,
             "Proceso Completado", JOptionPane.INFORMATION_MESSAGE);
-        dispose(); // Cierra la ventana
+        
+        // Se llama al callback y se cierra ---
+        if (onCompleteCallback != null) {
+            onCompleteCallback.run(); // Avisa al menú principal
+        }
+        dispose(); // Cierra esta ventana
     }
 
     private void setPanelEnabled(JPanel panel, boolean isEnabled) {
         panel.setEnabled(isEnabled);
         for (Component comp : panel.getComponents()) {
-            comp.setEnabled(isEnabled);
+            
+            if (comp instanceof JPanel) {
+                setPanelEnabled((JPanel) comp, isEnabled);
+            } else {
+                comp.setEnabled(isEnabled);
+            }
         }
     }
 
+    
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new FormularioActividad7().setVisible(true));
+        SwingUtilities.invokeLater(() -> new FormularioActividad7(() -> {
+            System.out.println("Prueba de Main: Actividad 7 completada.");
+        }).setVisible(true));
     }
 }

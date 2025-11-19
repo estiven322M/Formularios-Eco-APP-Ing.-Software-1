@@ -21,7 +21,14 @@ public class FormularioActividad1 extends JFrame {
     private JTextArea txtObservaciones;
     private JButton btnFinalizar;
 
-    public FormularioActividad1(String usuarioLogueado) {
+    // --- 1. Se añade la variable para el callback ---
+    private Runnable onCompleteCallback;
+
+    // --- 2. Constructor con Callback
+    public FormularioActividad1(String usuarioLogueado, Runnable onCompleteCallback) {
+        // Se guarda el callback
+        this.onCompleteCallback = onCompleteCallback;
+        
         setTitle("Formulario de Verificación de Paquete en Acopio - F-U6-03");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(820, 640);
@@ -206,7 +213,7 @@ public class FormularioActividad1 extends JFrame {
     }
 
     private void accionFinalizar() {
-        // Validaciones básicas
+        // Validaciones 
         if (!rbtnAceptar.isSelected() && !rbtnRechazar.isSelected()) {
             JOptionPane.showMessageDialog(this, "Seleccione una decisión: Aceptar o Rechazar.", "Validación", JOptionPane.WARNING_MESSAGE);
             return;
@@ -216,7 +223,7 @@ public class FormularioActividad1 extends JFrame {
             return;
         }
 
-        // Aquí se guardaría el resultado en tu modelo o persistencia
+        
         String resumen = String.format("Código: %s\nRegistrado: %s\nDecisión: %s\nJefe: %s\nFecha: %s",
                 txtCodigo.getText(),
                 chkRegistrado.isSelected() ? "Sí" : "No",
@@ -226,8 +233,11 @@ public class FormularioActividad1 extends JFrame {
 
         JOptionPane.showMessageDialog(this, "Verificación finalizada:\n\n" + resumen, "OK", JOptionPane.INFORMATION_MESSAGE);
 
-        // Reiniciar formulario si se desea:
-        // limpiarFormulario();
+        // Se llama al callback 
+        if (rbtnAceptar.isSelected() && onCompleteCallback != null) {
+            onCompleteCallback.run(); // Avisa al menú principal
+        }
+        dispose(); 
     }
 
     private void limpiarFormulario() {
@@ -244,12 +254,14 @@ public class FormularioActividad1 extends JFrame {
         txtCodigo.requestFocusInWindow();
     }
 
+    
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            // ejemplo de usuario logueado
-            FormularioActividad1 f = new FormularioActividad1(System.getProperty("user.name"));
+           
+            FormularioActividad1 f = new FormularioActividad1(System.getProperty("user.name"), () -> {
+                System.out.println("Prueba de Main: Actividad 1 completada.");
+            });
             f.setVisible(true);
         });
     }
 }
-
